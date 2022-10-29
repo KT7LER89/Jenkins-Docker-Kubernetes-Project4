@@ -27,3 +27,21 @@ spec:
             - containerPort: 8080
               protocol: TCP
           imagePullPolicy: Always
+ #servide type load Balancer
+ ---
+ apiVersion: v1
+kind: Service
+
+metadata:
+  name: webpage-service
+  labels:
+    app: webpage
+spec:
+  selector:
+    app: webpage
+
+  ports:
+    - port: 8080
+      targetPort: 8080
+
+  type: LoadBalancer
