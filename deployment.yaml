@@ -29,7 +29,7 @@ spec:
           imagePullPolicy: Always
  #servide type load Balancer
  ---
- apiVersion: v1
+apiVersion: v1
 kind: Service
 
 metadata:
