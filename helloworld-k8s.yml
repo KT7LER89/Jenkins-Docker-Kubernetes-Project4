@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kt7ler89-jenkins 
+  labels:
+    app: webpage
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+        app: webpage
+  
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: webpage
+    spec:
+      containers:
+        - name: webpage
+          image: 603422505859.dkr.ecr.us-east-1.amazonaws.com/kt7ler89/docker-jenkins:latest
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          imagePullPolicy: Always
