@@ -1,0 +1,37 @@
+node{
+	stage('Checkout SCM'){
+		git branch: 'main', credentialsId: 'git_credentials', url: 'https://github.com/KT7LER89/Jenkins-Docker-Kubernetes-Project4.git'
+	}
+
+	stage('Clone Repository') {
+		def mavenHome =  tool name: "Maven", type: "maven"
+		def mavenCMD = "${mavenHome}/bin/mvn"
+		sh "${mavenCMD} clean package"
+	}
+	
+	stage('Build'){
+		sh "docker build -t kt7ler89/docker-jenkins:${env.BUILD_ID} ."
+	}
+
+	stage('Test'){
+		withCredentials([string(credentialsId: 'docker_hub', variable: 'docker_hub')]) {
+			sh "docker login -u kt7ler89 -p ${docker_hub}"
+		}
+		sh "docker push kt7ler89/docker-jenkins:${env.BUILD_ID}"
+	}
+	
+	stage('Push'){
+		ECRURL = 'https://603422505859.dkr.ecr.us-east-1.amazonaws.com'
+		ECRRED = 'ecr:us-east-1:awscredentials'
+		docker.withRegistry("${ECRURL}","${ECRRED}"){
+			docker.image("kt7ler89/docker-jenkins:${env.BUILD_ID}").push()
+		}
+	}
+	
+	stage('Deploy'){
+		
+		sshagent(['aws_instance']) {
+		    sh "kubectl apply -f deployment.yaml"
+		}
+	}
+}
